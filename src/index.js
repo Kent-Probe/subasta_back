@@ -9,7 +9,6 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const passport = require("passport");
-const flash = require("connect-flash");
 const cors = require('cors');
 
 //base de datos
@@ -50,6 +49,8 @@ app.use(passport.session());
 require("./app/routes/routes")(app, passport);
 
 app.use(cors());
+
+
 app.post("/credenciales", async (req, res) => {
     const data = await find(req.body.nombreu, req.body.password)
     console.log(req.body);
@@ -57,14 +58,27 @@ app.post("/credenciales", async (req, res) => {
     res.send(data)
 });
 
+app.post("/registrar", (req, res) => {
+    console.log(req.body)
+    create(req.body.id, req.body.name, req.body.username, req.body.email, req.body.password, 'externo')
+    res.send('todo bien brooo')
+});
 //static fields
 //app.use(express.static())
 
 app.listen(app.get("port"), () => {
     console.log("server activo en ", app.get("port"));
 
-    //create(1000810902, 'Jhon boyner', 'jhonBoy', 'JhonBoyner.12@gmail.com', 'externo', 'contras');
+    //create();
     //update(1000810902, 'Jhon boyner franco', 'jhonBoy', 'JhonBoy0012@gmail.com', 'interno', 'yaNoEsContras')
     //deleteUser(1000810902)
     //find('jhonBoy');
+});
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+    next();
 });
