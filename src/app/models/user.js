@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema(
             type: String,
             lowercase: true,
             trim: true,
-            required: [true, "Es requerido"],
+            required: [true, "Es requerido"]
         },
         salt: {
             type: String,
@@ -63,16 +63,25 @@ const userSchema = new mongoose.Schema(
     { versionKey: false }
 );
 const userModel = mongoose.model("users", userSchema, "users");
-//mostrar Get
-const find = async (username, password) => {
+//mostrar y validar usuario
+const findUserU = async (username, password) => {
     const user = await userModel.findOne({
         username: username,
-        password: password,
-    });
+        password: password
+    }).exec();
+    return user;
+};
+//mostrar todos los usuarios
+const findUserAll = async (username) => {
+    const user = await userModel.find({});
     console.log(user);
     return user;
 };
-//crear Post
+const findUser = async (username) => {
+    const user = await userModel.findOne({ username: username})
+    return user;
+}
+//crear 
 const create = async (id, nameC, userC, emailC, passwordC, rolC) => {
     const user = new userModel({
         user_id: id,
@@ -86,7 +95,7 @@ const create = async (id, nameC, userC, emailC, passwordC, rolC) => {
     //el schema es solo para establecer los lineamientos de mongo
     await user.save();
 };
-//actualizar put
+//actualizar 
 const update = async (id, nameC, userC, emailC, rolC, passwordC) => {
     const user = await userModel.updateOne(
         { id: id },
@@ -101,15 +110,17 @@ const update = async (id, nameC, userC, emailC, rolC, passwordC) => {
         }
     );
 };
-//Eliminar delete
+//Eliminar 
 const deleteUser = async (id) => {
     const user = await userModel.deleteOne({ id: id });
 };
 
 module.exports = {
     deleteUser,
-    find,
+    findUser,
     update,
     create,
     userModel,
+    findUserAll,
+    findUser
 };

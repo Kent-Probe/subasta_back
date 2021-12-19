@@ -22,7 +22,8 @@ mongoose
     .then(() => console.log("Conectado a MongoDB Atlas"))
     .catch((error) => console.log(`A occurrido un error: ${error}`));
 
-const { find, deleteUser, update, create, userModel } = require("./app/models/user");
+const { findUserU, findUserAll, findUser, deleteUser, update, create, userModel } = require("./app/models/user");
+const { findAuctionAll, findAuction, deleteAuction, updateAuction, createAuction, updateAuctionWinner } = require('./app/models/auction')
 
 //seetings
 app.set("views", "localhost:3000");
@@ -40,23 +41,31 @@ app.use(
         resave: false,
         saveUninitialized: false,
     })
-);
+    );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors());
 //app.use(flash());
 
 //routes
 require("./app/routes/routes")(app, passport);
 
-app.use(cors());
-
+app.post('/productos', async (req, res) => {
+    const data = await findAuctionAll();
+    res.send(data)
+})
 
 app.post("/credenciales", async (req, res) => {
-    const data = await find(req.body.nombreu, req.body.password)
-    console.log(req.body);
-    console.log(data)
-    res.send(data)
+    const data = await findUser(req.body.nombreu, req.body.password);
+    if (data === null){
+        data = await findUserU(req.body.nombreu);
+    }
+    res.send(data);
 });
+
+app.post('/obtenerUser', async (req, res) => {
+    const data = await findUser(req.body.nombreu)
+})
 
 app.post("/registrar", (req, res) => {
     console.log(req.body)
@@ -66,10 +75,11 @@ app.post("/registrar", (req, res) => {
 //static fields
 //app.use(express.static())
 
-app.listen(app.get("port"), () => {
+app.listen(app.get("port"), async () => {
     console.log("server activo en ", app.get("port"));
-
-    //create();
+    
+    //console.log( await findUserAll())
+    //create(1, 'prueba 1A', 'prueba1a', 'prueba1A@gmail.com', 'password', 'interno')
     //update(1000810902, 'Jhon boyner franco', 'jhonBoy', 'JhonBoy0012@gmail.com', 'interno', 'yaNoEsContras')
     //deleteUser(1000810902)
     //find('jhonBoy');
