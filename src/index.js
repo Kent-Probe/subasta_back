@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const passport = require("passport");
-const cors = require('cors');
+const cors = require("cors");
 
 //base de datos
 const { url } = require("./config/database");
@@ -22,8 +22,23 @@ mongoose
     .then(() => console.log("Conectado a MongoDB Atlas"))
     .catch((error) => console.log(`A occurrido un error: ${error}`));
 
-const { findUserU, findUserAll, findUser, deleteUser, update, create, userModel } = require("./app/models/user");
-const { findAuctionAll, findAuction, deleteAuction, updateAuction, createAuction, updateAuctionWinner } = require('./app/models/auction')
+const {
+    findUserU,
+    findUserAll,
+    findUser,
+    deleteUser,
+    update,
+    create,
+    userModel,
+} = require("./app/models/user");
+const {
+    findAuctionAll,
+    findAuction,
+    deleteAuction,
+    updateAuction,
+    createAuction,
+    updateAuctionWinner,
+} = require("./app/models/auction");
 
 //seetings
 app.set("views", "localhost:3000");
@@ -41,7 +56,7 @@ app.use(
         resave: false,
         saveUninitialized: false,
     })
-    );
+);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors());
@@ -50,34 +65,61 @@ app.use(cors());
 //routes
 require("./app/routes/routes")(app, passport);
 
-app.post('/productos', async (req, res) => {
+app.post("/producto", async (req, res) => {
     const data = await findAuctionAll();
-    res.send(data)
-})
+    res.send(data);
+});
+
+app.post("/addProducto", async (req, res) => {
+    console.log(req.body)
+    createAuction(
+        req.body.name,
+        req.body.des,
+        req.body.date_end,
+        req.body.start_amount,
+        req.body.username,
+        req.body.img,
+        req.body.username
+    );
+    res.send("Todo bien");
+});
 
 app.post("/credenciales", async (req, res) => {
     const data = await findUser(req.body.nombreu, req.body.password);
-    if (data === null){
+    if (data === null) {
         data = await findUserU(req.body.nombreu);
     }
     res.send(data);
 });
 
-app.post('/obtenerUser', async (req, res) => {
-    const data = await findUser(req.body.nombreu)
+app.post('/users', async (req, res) => {
+    const data = await findUserAll();
+    res.send(data);
 })
 
+app.post("/obtenerUser", async (req, res) => {
+    const data = await findUser(req.body.nombreu);
+});
+
 app.post("/registrar", (req, res) => {
-    console.log(req.body)
-    create(req.body.id, req.body.name, req.body.username, req.body.email, req.body.password, 'externo')
-    res.send('todo bien brooo')
+    console.log(req.body);
+    create(
+        req.body.id,
+        req.body.name,
+        req.body.username,
+        req.body.email,
+        req.body.password,
+        "externo"
+    );
+    res.send("todo bien brooo");
 });
 //static fields
 //app.use(express.static())
 
 app.listen(app.get("port"), async () => {
     console.log("server activo en ", app.get("port"));
-    
+    console.log();
+    console.log(await findAuction("prueba1a"));
     //console.log( await findUserAll())
     //create(1, 'prueba 1A', 'prueba1a', 'prueba1A@gmail.com', 'password', 'interno')
     //update(1000810902, 'Jhon boyner franco', 'jhonBoy', 'JhonBoy0012@gmail.com', 'interno', 'yaNoEsContras')
@@ -86,9 +128,15 @@ app.listen(app.get("port"), async () => {
 });
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method"
+    );
+    res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, OPTIONS, PUT, DELETE"
+    );
+    res.header("Allow", "GET, POST, OPTIONS, PUT, DELETE");
     next();
 });

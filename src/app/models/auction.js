@@ -2,12 +2,6 @@ const mongoose = require('mongoose')
 
 //modelo de las subastas
 const auctiontSchema = new mongoose.Schema({
-    auction_id : {
-        type : Number,
-        unique : true,
-        trim: true,
-        required: [true, "Es requerido"]
-    },
     img: {
         type : String,
         trim: true,
@@ -43,6 +37,10 @@ const auctiontSchema = new mongoose.Schema({
     winner : {
         type : String,
         trim: true,
+    },
+    username:{
+        type : String,
+        trim: true,
     }
 }, { versionKey: false }) 
 
@@ -50,9 +48,9 @@ const auctiontSchema = new mongoose.Schema({
 const auctiontModel = mongoose.model("auctions", auctiontSchema, "auctions");
 
 //mostrar 
-const findAuction = async (id) => {
+const findAuction = async (username) => {
     const user = await auctiontModel.findOne({
-        auction_id: id
+        username: username
     });
     return user;
 };
@@ -64,16 +62,17 @@ const findAuctionAll = async () => {
 };
 
 //crear 
-const createAuction = async (auction_id, img, auction_name, auction_des, auction_DateTime_Now, auction_DateTime_Finalize, start_Amount, winner) => {
+const createAuction = async (auction_name, auction_des, auction_DateTime_Finalize, start_amount, winner, img, username) => {
+    let date = new Date();
     const user = new auctiontModel({
-        auction_id: auction_id,
         img: img,
         auction_name: auction_name,
         auction_des: auction_des,
-        auction_DateTime_Now: auction_DateTime_Now,
+        auction_DateTime_Now: date,
         auction_DateTime_Finalize: auction_DateTime_Finalize,
-        start_Amount: start_Amount,
-        winner : winner
+        start_Amount: start_amount,
+        winner : winner,
+        username: username
 
     }); //estas creando un objeto en mongo debes usar el modelo
     //el schema es solo para establecer los lineamientos de mongo

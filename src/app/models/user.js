@@ -72,7 +72,7 @@ const findUserU = async (username, password) => {
     return user;
 };
 //mostrar todos los usuarios
-const findUserAll = async (username) => {
+const findUserAll = async () => {
     const user = await userModel.find({});
     console.log(user);
     return user;
